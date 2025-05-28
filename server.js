@@ -3,7 +3,7 @@ const app = express();
 const PORT = 3000;
 
 app.get('/', (req, res) => {
-    res.send('Welcome ');
+    res.send('Welcome to the Express Lab!');
 });
 
 app.get('/greetings/:username', (req, res) => {
@@ -14,25 +14,27 @@ app.get('/greetings/:username', (req, res) => {
 app.get('/roll/:number', (req, res) => {
     const number = parseInt(req.params.number);
     if (isNaN(number)) {
-        return res.send("You must specify a number.");
+        res.send("You must specify a number.");
+    } else {
+        const rolled = Math.floor(Math.random() * (number + 1));
+        res.send(`You rolled a ${rolled}.`);
     }
-    const result = Math.floor(Math.random() * (number + 1));
-    res.send(`You rolled a ${result}.`);
 });
 
 const collectibles = [
     { name: 'shiny ball', price: 5.95 },
     { name: 'autographed picture of a dog', price: 10 },
-    { name: 'vintage 1970s yogurt SOLD AS-IS', price: 2.99 }
+    { name: 'vintage 1970s yogurt SOLD AS-IS', price: 0.99 }
 ];
 
 app.get('/collectibles/:index', (req, res) => {
     const index = parseInt(req.params.index);
     if (index < 0 || index >= collectibles.length) {
-        return res.send("This item is not yet in stock. Check back soon!");
+        res.send("This item is not yet in stock. Check back soon!");
+    } else {
+        const item = collectibles[index];
+        res.send(`So, you want the ${item.name}? For ${item.price}, it can be yours!`);
     }
-    const item = collectibles[index];
-    res.send(`So, you want the ${item.name}? For ${item.price}, it can be yours!`);
 });
 
 const shoes = [
@@ -46,25 +48,31 @@ const shoes = [
 ];
 
 app.get('/shoes', (req, res) => {
-    let filteredShoes = shoes;
+    let result = shoes;
 
-    const minPrice = parseFloat(req.query["min-price"]);
-    const maxPrice = parseFloat(req.query["max-price"]);
+    const min = parseFloat(req.query["min-price"]);
+    const max = parseFloat(req.query["max-price"]);
     const type = req.query.type;
 
-    if (!isNaN(minPrice)) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.price >= minPrice);
+    if (!isNaN(min)) {
+        result = result.filter(shoe => shoe.price >= min);
     }
 
-    if (!isNaN(maxPrice)) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.price <= maxPrice);
+    if (!isNaN(max)) {
+        result = result.filter(shoe => shoe.price <= max);
     }
 
     if (type) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.type === type);
+        result = result.filter(shoe => shoe.type === type);
     }
 
-    res.send(filteredShoes);
+    res.send(result);
+});
+
+app.get('/hello', (req, res) => {
+    const name = req.query.name;
+    const age = req.query.age;
+    res.send(`Hello there, ${name}! I hear you are ${age} years old!`);
 });
 
 app.listen(PORT, () => {
